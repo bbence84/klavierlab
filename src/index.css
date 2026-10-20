@@ -214,7 +214,7 @@
 .settings-sound-toggle > svg { width: 16px; height: 16px; color: var(--accent); }
 .settings-sound-toggle:hover { background: var(--muted-surface); }
 .options-menu:not([open]) > .options-panel { display: none; }
-.falling-stage { flex: 1; min-height: 220px; height: auto; background: #17191c !important; }
+.falling-stage { flex: 1 1 auto; min-height: 80px; height: auto; background: #17191c !important; }
 .stage-legend { position: absolute; top: 16px; left: 20px; display: flex; gap: 16px; font-size: 10px; color: #a1a1aa; pointer-events: none; }
 .stage-legend span { display: flex; align-items: center; gap: 6px; }
 .stage-legend i { width: 6px; height: 6px; border-radius: 50%; background: #70ceaa; }
@@ -226,8 +226,10 @@
 .piano-keyboard > div:last-child { height: 147px; }
 .piano-keyboard button { border-radius: 0 0 3px 3px; }
 .sheet-music { background: var(--surface) !important; }
-.vexflow-sheet > svg { height: 280px; flex-shrink: 0; }
-.vexflow-sheet.sheet-expanded > svg { flex: 1; min-height: 280px; }
+.vexflow-sheet { flex: 0 1 auto; min-height: 0; }
+.vexflow-sheet > svg { height: clamp(150px, 30vh, 300px); flex-shrink: 0; }
+.vexflow-sheet.sheet-expanded { flex: 1 1 auto; }
+.vexflow-sheet.sheet-expanded > svg { flex: 1; height: auto; min-height: 200px; }
 .vexflow-sheet .notation-event[data-active="true"] { filter: drop-shadow(0 0 2px #38ab8270); }
 .sheet-music > div:first-child { padding: 8px 24px; font-size: 10px; }
 .sheet-music > div:first-child > div:last-child { display: none; }

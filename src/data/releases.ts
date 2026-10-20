@@ -22,6 +22,15 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.1', date: '2026-10-20', reconstructed: false,
+    title: { en: 'Notation layout fixes', hu: 'Kotta elrendezési javítások' },
+    changes: [
+      { kind: 'fixed', text: { en: 'The piano keyboard is no longer pushed below the fold — the practice workspace now fits the viewport with the taller VexFlow staff.', hu: 'A zongorabillentyűzet már nem csúszik a képernyő alá — a gyakorlófelület a magasabb VexFlow kottával együtt is elfér a nézetben.' } },
+      { kind: 'fixed', text: { en: 'High treble notes with long stems and fingering, and low bass notes, are no longer clipped at the top or bottom of the staff.', hu: 'A hosszú szárú, ujjrendes magas violinkulcsos hangok és a mély basszushangok már nem vágódnak le a kotta tetején vagy alján.' } },
+      { kind: 'fixed', text: { en: 'Notes near the right edge now always have staff lines beneath them; the staff extends under every engraved note.', hu: 'A jobb szélhez közeli hangok alatt már mindig van vonalrendszer; a kotta minden lejegyzett hang alá kiterjed.' } },
+    ],
+  },
+  {
     version: '0.12.0', date: '2026-10-20', reconstructed: false,
     title: { en: 'VexFlow notation & sampled piano by default', hu: 'VexFlow kotta és alapértelmezett mintavételezett zongora' },
     changes: [

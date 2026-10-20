@@ -1,8 +1,10 @@
 import { Accidental, BarlineType, Beam, Dot, FretHandFinger, ModifierContext, Renderer, Stave, StaveConnector, StaveNote, SVGContext, TickContext, Tuplet } from 'vexflow/bravura';
 import { HandSelection, Song, SongNote } from '../types/music';
 
-export const NOTATION_HEIGHT = 280;
+export const NOTATION_HEIGHT = 320;
 export const NOTATION_HEADER = 150;
+const TREBLE_Y = 50;
+const BASS_Y = 160;
 
 interface Rhythm {
   duration: string;
@@ -99,7 +101,10 @@ export function renderVexFlow(container: SVGGElement, options: RenderOptions): v
   const { song, width, origin, secondsPerUnit, start, end, light, handSelection } = options;
   const holder = document.createElement('div');
   const renderer = new Renderer(holder, Renderer.Backends.SVG);
-  renderer.resize(width, NOTATION_HEIGHT);
+  // Extend the staff lines to cover the full rendered time window (notes are engraved ahead of
+  // the visible width and then scrolled in via the moving timeline), so every note sits on a staff.
+  const staveWidth = Math.ceil(Math.max(width, NOTATION_HEADER + (end - origin) / secondsPerUnit + 48));
+  renderer.resize(staveWidth, NOTATION_HEIGHT);
   const context = renderer.getContext() as SVGContext;
   const ink = light ? '#52525b' : '#a1a1aa';
   context.setFillStyle(ink).setStrokeStyle(ink);
@@ -111,8 +116,8 @@ export function renderVexFlow(container: SVGGElement, options: RenderOptions): v
   const signature = new Map<string, string>();
   for (const letter of (fifths < 0 ? 'beadgcf' : 'fcgdaeb').slice(0, Math.abs(fifths))) signature.set(letter, fifths < 0 ? 'b' : '#');
   const timeSignature = `${song.timeSignature[0]}/${song.timeSignature[1]}`;
-  const treble = new Stave(0, 30, width).setBegBarType(BarlineType.NONE).setEndBarType(BarlineType.NONE);
-  const bass = new Stave(0, 140, width).setBegBarType(BarlineType.NONE).setEndBarType(BarlineType.NONE);
+  const treble = new Stave(0, TREBLE_Y, staveWidth).setBegBarType(BarlineType.NONE).setEndBarType(BarlineType.NONE);
+  const bass = new Stave(0, BASS_Y, staveWidth).setBegBarType(BarlineType.NONE).setEndBarType(BarlineType.NONE);
   for (const stave of [treble, bass]) stave.setStyle({ strokeStyle: ink, fillStyle: ink }).setContext(context).draw();
   const moving = context.openGroup('notation-timeline');
   moving.classList.add('notation-timeline');
@@ -189,8 +194,8 @@ export function renderVexFlow(container: SVGGElement, options: RenderOptions): v
   context.closeGroup();
   context.setFillStyle(background).fillRect(0, 0, NOTATION_HEADER, NOTATION_HEIGHT);
   context.setFillStyle(ink).setStrokeStyle(ink);
-  const headerTreble = new Stave(0, 30, NOTATION_HEADER).addClef('treble').addKeySignature(key).addTimeSignature(timeSignature);
-  const headerBass = new Stave(0, 140, NOTATION_HEADER).addClef('bass').addKeySignature(key).addTimeSignature(timeSignature);
+  const headerTreble = new Stave(0, TREBLE_Y, NOTATION_HEADER).addClef('treble').addKeySignature(key).addTimeSignature(timeSignature);
+  const headerBass = new Stave(0, BASS_Y, NOTATION_HEADER).addClef('bass').addKeySignature(key).addTimeSignature(timeSignature);
   for (const stave of [headerTreble, headerBass]) stave.setStyle({ fillStyle: ink, strokeStyle: ink }).setContext(context).draw();
   new StaveConnector(headerTreble, headerBass).setType(StaveConnector.type.BRACE).setStyle({ fillStyle: ink, strokeStyle: ink }).setContext(context).draw();
   container.replaceChildren(...Array.from(context.svg.childNodes));

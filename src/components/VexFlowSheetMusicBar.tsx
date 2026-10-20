@@ -103,13 +103,13 @@ export function SheetMusicBar({ song, notes, currentTime, handSelection, lang, t
         </div>
         <div className="flex gap-4"><span>{t.trebleLegend}</span><span>{t.bassLegend}</span></div>
       </div>
-      <svg viewBox={`0 0 ${width} ${NOTATION_HEIGHT}`} data-content-start={NOTATION_HEADER} data-renderer="vexflow" className={`sheet-navigation-surface w-full block ${expanded ? 'flex-1 min-h-[280px]' : 'h-[280px]'}`}
+      <svg viewBox={`0 0 ${width} ${NOTATION_HEIGHT}`} data-content-start={NOTATION_HEADER} data-renderer="vexflow" className={`sheet-navigation-surface w-full block ${expanded ? 'flex-1' : ''}`}
         preserveAspectRatio="xMinYMid meet" aria-label={lang === 'hu' ? 'Kotta' : 'Sheet music staff'}
         style={onSeek ? { touchAction: 'pan-y', cursor: isDragging ? 'grabbing' : 'grab' } : undefined}
         onPointerDown={beginSeek} onPointerMove={moveSeek} onPointerUp={event => finishSeek(event)} onPointerCancel={event => finishSeek(event, true)} onLostPointerCapture={event => finishSeek(event, true)}>
         <rect width={width} height={NOTATION_HEIGHT} fill={theme === 'light' ? '#ffffff' : '#1b1c1f'} />
         <g ref={notationRef} />
-        <line x1={playheadX} x2={playheadX} y1={35} y2={260} stroke={theme === 'light' ? '#228461' : '#87d9ba'} strokeWidth={2} strokeDasharray="3 3" />
+        <line x1={playheadX} x2={playheadX} y1={55} y2={290} stroke={theme === 'light' ? '#228461' : '#87d9ba'} strokeWidth={2} strokeDasharray="3 3" />
       </svg>
     </div>
   );
