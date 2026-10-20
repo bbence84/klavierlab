@@ -22,6 +22,34 @@ default `npm run dev` also exposes it to the local network.
 No Gemini API key, environment file, backend, or database is required.
 Google Fonts are fetched remotely; the app uses fallback fonts when offline.
 
+### Experimental Notation Branch
+
+`main` preserves the v0.11.2 baseline (`bd44f91`), including the original
+custom SVG renderer. `feature/vexflow-notation` replaces the sheet with
+[VexFlow 5](https://github.com/vexflow/vexflow) engraving. This experiment is
+local only: no GitHub remote is configured and it has not been deployed.
+The app version remains 0.11.2 until a release is prepared.
+
+The renderer supplies treble/bass clefs, key and time signatures, noteheads,
+chords, ledger lines, rests, contextual accidentals, dots, beams, triplets, and
+available finger numbers. Bravura and Academico fonts are embedded in the
+bundle; notation does not need a font CDN. Existing practice audio, grading,
+hand selection, seeking, and touch dragging remain connected to the same state.
+The SVG timeline scrolls between engraving updates instead of rebuilding every
+animation frame. License notices ship in
+[public/vexflow-notices.txt](public/vexflow-notices.txt).
+
+This is not lossless MusicXML engraving. Rhythms, spelling, rests, and beam
+groups are inferred from timed notes using the initial tempo and meter.
+Independent voices, ties across bars, original enharmonic spellings, dynamics,
+and layout are not reconstructed. Dense passages can crowd in the deliberately
+time-proportional scrolling view, especially on mobile.
+
+Run `npm run test:ui -- tests/notation.spec.ts` for focused engraving checks,
+including all 24 built-in pieces. After committing or stashing local work,
+`git switch main` and `git switch feature/vexflow-notation` compare the versions;
+run `npm ci` after switching because their dependencies differ.
+
 ```sh
 npm run lint     # TypeScript check (not an ESLint ruleset)
 npm run build    # Production output in dist/
@@ -313,7 +341,8 @@ they should be treated as supported release workflows.
 | [src/utils/musicTheory.ts](src/utils/musicTheory.ts) | Keyboard geometry, note names/frequencies, staff positions, and computer-key mappings. |
 | [src/utils/i18n.ts](src/utils/i18n.ts) | Shared HU/EN strings and labels; some view-specific strings also live in components. |
 | [src/components/FallingNotesCanvas.tsx](src/components/FallingNotesCanvas.tsx) | Canvas note timeline and live feedback rendering. |
-| [src/components/SheetMusicBar.tsx](src/components/SheetMusicBar.tsx) | Custom SVG grand staff synchronized with playback. |
+| [src/components/VexFlowSheetMusicBar.tsx](src/components/VexFlowSheetMusicBar.tsx) | Responsive VexFlow sheet, playback highlighting, scrolling, and pointer/touch seeking. |
+| [src/utils/vexflowNotation.ts](src/utils/vexflowNotation.ts) | Timed-note rhythm inference and VexFlow SVG engraving with embedded fonts. |
 | [src/components/PianoKeyboard.tsx](src/components/PianoKeyboard.tsx) | Interactive keyboard and active/target key display. |
 | [src/components/SongLibraryView.tsx](src/components/SongLibraryView.tsx) | Repertoire filters, file import with supported formats shown, rename/delete entry points. |
 | [src/components/SessionSummaryModal.tsx](src/components/SessionSummaryModal.tsx) | Session results and rule-based `computeAdaptiveRecommendation`; this is not an AI service. |

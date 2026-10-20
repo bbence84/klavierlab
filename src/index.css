@@ -226,6 +226,9 @@
 .piano-keyboard > div:last-child { height: 147px; }
 .piano-keyboard button { border-radius: 0 0 3px 3px; }
 .sheet-music { background: var(--surface) !important; }
+.vexflow-sheet > svg { height: 280px; flex-shrink: 0; }
+.vexflow-sheet.sheet-expanded > svg { flex: 1; min-height: 280px; }
+.vexflow-sheet .notation-event[data-active="true"] { filter: drop-shadow(0 0 2px #38ab8270); }
 .sheet-music > div:first-child { padding: 8px 24px; font-size: 10px; }
 .sheet-music > div:first-child > div:last-child { display: none; }
 .app-main > :not(.practice-workspace) { width: 100%; max-width: 1200px; padding: 40px; }

@@ -7,7 +7,7 @@ import { PianoKeyboard } from './components/PianoKeyboard';
 import { ProgressDashboardView } from './components/ProgressDashboardView';
 import { SessionSummaryModal } from './components/SessionSummaryModal';
 import { SetupGuideView } from './components/SetupGuideView';
-import { SheetMusicBar } from './components/SheetMusicBar';
+import { SheetMusicBar } from './components/VexFlowSheetMusicBar';
 import { SongLibraryView } from './components/SongLibraryView';
 import { SongPicker } from './components/SongPicker';
 import { INITIAL_SONGS, LEVEL_TITLES } from './data/songs';

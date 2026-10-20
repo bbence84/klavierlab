@@ -409,7 +409,7 @@ test('clicking a sheet note seeks and starts playback at its actual SVG position
   await page.locator('.practice-options summary').click();
   await page.getByRole('button', { name: 'Continuous Tempo', exact: true }).click();
   await page.keyboard.press('Escape');
-  const note = page.locator('.sheet-music svg ellipse').nth(2);
+  const note = page.locator('.sheet-music .notation-event[data-note-ids="right-2"] .vf-stavenote > rect').first();
   await note.click();
   await expect(page.getByRole('slider', { name: 'Song position', exact: true })).toHaveValue('1.6');
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
@@ -418,7 +418,8 @@ test('clicking a sheet note seeks and starts playback at its actual SVG position
 async function sheetPoint(page: Page, fraction: number) {
   return page.locator('.sheet-music svg').evaluate((element, ratio) => {
     if (!(element instanceof SVGSVGElement)) throw new Error('Expected sheet SVG');
-    const point = new DOMPoint(88 + (element.viewBox.baseVal.width - 88) * ratio, 68).matrixTransform(element.getScreenCTM()!);
+    const start = Number(element.dataset.contentStart || 88);
+    const point = new DOMPoint(start + (element.viewBox.baseVal.width - start) * ratio, element.viewBox.baseVal.height / 2).matrixTransform(element.getScreenCTM()!);
     return { x: point.x, y: point.y };
   }, fraction);
 }
@@ -461,7 +462,7 @@ test('mobile sheet-only clicks use the rendered note position without stretching
   await page.locator('.display-options summary').click();
   await page.getByRole('button', { name: 'Falling Notes', exact: true }).click();
   await page.keyboard.press('Escape');
-  await page.locator('.sheet-music svg ellipse').nth(2).click();
+  await page.locator('.sheet-music .notation-event[data-note-ids="right-2"] .vf-stavenote > rect').first().click();
   await expect(page.getByRole('slider', { name: 'Song position', exact: true })).toHaveValue('1.6');
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('sheet-seek-mobile.png'), fullPage: true });
