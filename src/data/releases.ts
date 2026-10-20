@@ -22,6 +22,14 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.2', date: '2026-10-20', reconstructed: false,
+    title: { en: 'Smoother playback on tablets', hu: 'Gördülékenyebb lejátszás táblagépeken' },
+    changes: [
+      { kind: 'fixed', text: { en: 'Playback (Demo and practice modes) is much smoother and audio no longer lags on tablets and lower-powered devices. The falling-notes animation now runs independently of React, so the main thread is no longer overloaded and the sound stays in sync.', hu: 'A lejátszás (Demó és gyakorló módok) sokkal gördülékenyebb, és a hang már nem akadozik táblagépeken és gyengébb eszközökön. A lehulló hangjegyek animációja mostantól a Reacttől függetlenül fut, így a fő szál nem terhelődik túl, és a hang szinkronban marad.' } },
+      { kind: 'changed', text: { en: 'The practice screen now updates React state about 15 times per second instead of on every frame, while the note animation keeps the full display refresh rate — cutting CPU work during playback by up to ~10× on high-refresh tablets.', hu: 'A gyakorló képernyő mostantól másodpercenként kb. 15-ször frissíti a React állapotot minden képkocka helyett, miközben a hangjegyanimáció a teljes képfrissítési frekvencián fut — ez a lejátszás alatti CPU-terhelést akár ~10-szeresére csökkenti a magas képfrissítésű táblagépeken.' } },
+    ],
+  },
+  {
     version: '0.12.1', date: '2026-10-20', reconstructed: false,
     title: { en: 'Notation layout fixes', hu: 'Kotta elrendezési javítások' },
     changes: [

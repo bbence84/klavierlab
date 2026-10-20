@@ -30,14 +30,30 @@ export interface KeyGeometry {
   whiteKeyIndex: number;   // index among white keys
 }
 
+// Geometry is fully determined by (minMidi, maxMidi) and never changes at runtime,
+// so we memoize per range. The falling-notes canvas redraws every animation frame
+// and must NOT rebuild these arrays + Map each time (avoids per-frame GC churn on
+// lower-powered tablets).
+const geometryCache = new Map<
+  string,
+  { keys: KeyGeometry[]; byMidi: Map<number, KeyGeometry>; whiteKeyCount: number }
+>();
+
 /**
  * Computes exact normalized horizontal positions [0..1] for every MIDI key in [minMidi, maxMidi]
  * so both the FallingNotesCanvas and PianoKeyboard share identical lane geometry.
+ *
+ * The result is cached per (minMidi, maxMidi) range and returned by reference. Callers must
+ * treat the returned structures as immutable.
  */
 export function computeKeyboardGeometry(
   minMidi: number = DEFAULT_MIN_MIDI,
   maxMidi: number = DEFAULT_MAX_MIDI
 ): { keys: KeyGeometry[]; byMidi: Map<number, KeyGeometry>; whiteKeyCount: number } {
+  const cacheKey = `${minMidi}:${maxMidi}`;
+  const cached = geometryCache.get(cacheKey);
+  if (cached) return cached;
+
   const whiteKeys: number[] = [];
   for (let m = minMidi; m <= maxMidi; m++) {
     if (!isBlackKey(m)) {
@@ -88,7 +104,9 @@ export function computeKeyboardGeometry(
     }
   }
 
-  return { keys, byMidi, whiteKeyCount };
+  const result = { keys, byMidi, whiteKeyCount };
+  geometryCache.set(cacheKey, result);
+  return result;
 }
 
 /**

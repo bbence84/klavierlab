@@ -335,6 +335,11 @@ export default function App() {
   const lastBeatIndexRef = useRef<number>(-1);
   const finalizedSessionRef = useRef<SessionStats | null>(null);
   const previousSongIdRef = useRef(currentSong.id);
+  // Throttle React currentTime state updates so the whole App tree does not reconcile
+  // on every animation frame (60-120fps). The falling-notes canvas reads currentTimeRef
+  // directly for smooth motion; React state only drives the coarse UI (time counter,
+  // position slider, sheet scroll, active-key highlight) at ~15fps.
+  const lastReactTimeSyncRef = useRef<number>(0);
 
   useEffect(() => {
     currentTimeRef.current = currentTime;
@@ -823,6 +828,7 @@ export default function App() {
           currSec = earliestPendingTarget.startTime;
           currentTimeRef.current = currSec;
           setCurrentTime(currSec);
+          lastReactTimeSyncRef.current = now;
           animId = requestAnimationFrame(step);
           return;
         }
@@ -832,7 +838,12 @@ export default function App() {
       const reachedEnd = rawNextSec >= songEndTime;
       const nextSec = reachedEnd ? songEndTime : rawNextSec;
       currentTimeRef.current = nextSec;
-      setCurrentTime(nextSec);
+      // Push to React state only ~15x/sec (or immediately at song end) to avoid a full
+      // App re-render on every frame. currentTimeRef is always current for the canvas.
+      if (reachedEnd || now - lastReactTimeSyncRef.current >= 66) {
+        lastReactTimeSyncRef.current = now;
+        setCurrentTime(nextSec);
+      }
 
       // Synchronized Metronome Beat Calculation (only while music is actively playing before end)
       if (!reachedEnd) {
@@ -854,8 +865,12 @@ export default function App() {
         }
       }
 
-      let notesChanged = false;
-      const updatedNotes = notes.map((note) => {
+      // Walk notes in place. Only allocate a new array when a note's status actually
+      // changes (continuous-mode miss), otherwise reuse the existing reference to avoid
+      // creating a fresh array + objects on every animation frame (GC churn on tablets).
+      let updatedNotes: SongNote[] | null = null;
+      for (let i = 0; i < notes.length; i++) {
+        const note = notes[i];
         const isTargetHand = handSelection === 'both' || note.hand === handSelection;
 
         if (
@@ -887,18 +902,16 @@ export default function App() {
           note.status === 'pending' &&
           (nextSec > note.startTime + 0.26 || reachedEnd)
         ) {
-          notesChanged = true;
-          return {
+          if (!updatedNotes) updatedNotes = notes.slice();
+          updatedNotes[i] = {
             ...note,
             status: 'missed' as const,
             hitGrade: 'miss' as const,
           };
         }
+      }
 
-        return note;
-      });
-
-      if (notesChanged) {
+      if (updatedNotes) {
         sessionNotesRef.current = updatedNotes;
         setSessionNotes(updatedNotes);
       }
@@ -1711,6 +1724,8 @@ export default function App() {
                 song={currentSong}
                 notes={sessionNotes}
                 currentTime={currentTime}
+                currentTimeRef={currentTimeRef}
+                isPlaying={isPlaying}
                 activeMidiKeys={displayedActiveMidiKeys}
                 waitingTargetNotes={waitingTargetNotes}
                 handSelection={handSelection}
