@@ -60,8 +60,7 @@ test.beforeEach(async ({ page }) => {
 async function chooseSampled(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.locator('.practice-options summary').click();
-  await expect(page.getByLabel('Piano sound', { exact: true })).toHaveValue('original');
-  await page.getByLabel('Piano sound', { exact: true }).selectOption('sampled');
+  await expect(page.getByLabel('Piano sound', { exact: true })).toHaveValue('sampled');
 }
 
 async function playNote(page: Page, duration?: number) {
@@ -135,9 +134,10 @@ test('sampled piano produces audio, releases notes, mutes, and switches back to 
   expect(errors).toEqual([]);
 });
 
-test('the original engine plays without downloading piano samples', async ({ page }) => {
+test('a saved original engine choice plays without downloading piano samples', async ({ page }) => {
   let requests = 0;
   await page.route('https://smpldsnds.github.io/**', route => { requests++; return route.abort(); });
+  await page.addInitScript(() => localStorage.setItem('klavierlab_practice_preferences_v1', JSON.stringify({ soundEngine: 'original' })));
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.keyboard.press('a');
   expect(await page.evaluate(() => window.audioProbe.oscillators)).toBeGreaterThan(0);

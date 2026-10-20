@@ -22,13 +22,14 @@ default `npm run dev` also exposes it to the local network.
 No Gemini API key, environment file, backend, or database is required.
 Google Fonts are fetched remotely; the app uses fallback fonts when offline.
 
-### Experimental Notation Branch
+### Notation Renderer
 
 `main` preserves the v0.11.2 baseline (`bd44f91`), including the original
-custom SVG renderer. `feature/vexflow-notation` replaces the sheet with
-[VexFlow 5](https://github.com/vexflow/vexflow) engraving. This experiment is
-local only: no GitHub remote is configured and it has not been deployed.
-The app version remains 0.11.2 until a release is prepared.
+custom SVG renderer. Version 0.12.0 on `feature/vexflow-notation` replaces the
+sheet with [VexFlow 5](https://github.com/vexflow/vexflow) engraving and makes
+sampled piano the default for new profiles. No GitHub remote is configured.
+Direct Pages deployment can publish this branch's build to the production
+`main` target without merging or changing the local `main` branch.
 
 The renderer supplies treble/bass clefs, key and time signatures, noteheads,
 chords, ledger lines, rests, contextual accidentals, dots, beams, triplets, and
@@ -238,11 +239,12 @@ Open Settings (the sliders icon beside the hand controls), then choose Piano sou
 The browser sound on/mute toggle is in the same Settings menu. Display (the eye
 icon) contains only sheet music, falling notes, and key-label options.
 
-- Original synth: the existing oscillator-based piano, the default, with no
+- Original synth: the existing oscillator-based piano, with no
    sample downloads.
 - Sampled grand piano (smplr): recorded piano samples with velocity layers,
-   loaded only after selecting this option. The selection is saved with practice
-   preferences, but restoring it never starts playback automatically.
+   the default for new profiles or preferences without a saved sound choice.
+   Existing saved choices are preserved. Samples load in the background when
+   this engine is active; restoring it never starts playback automatically.
 
 The sampler uses [smplr](https://github.com/danigb/smplr) (MIT) and its
 SplendidGrandPiano instrument. The [upstream sample project](https://github.com/sfzinstruments/SplendidGrandPiano)
@@ -252,8 +254,14 @@ This integration uses the library's sample mapping, not the full SFZ feature set
 
 Samples for the studio's C2-C6 range are fetched from
 `https://smpldsnds.github.io/sfzinstruments-splendid-grand-piano/samples/`.
-This is an external download, not an upload of your MIDI/score. Initial loading
-requires internet access and uses more memory than the original synth. Supported
+This is an external download, not an upload of your MIDI/score. A cold-cache
+measurement downloaded 132 files totaling approximately 14.8 MB. On the tested
+connection, sampled sound was ready about 1.2 seconds after navigation and
+about 0.4 seconds on a cached reload, which made no sample network requests.
+These are local measurements, not guarantees for slower networks or devices.
+The interface does not wait for the samples; the original synth remains usable
+while they load. Initial loading requires internet access and uses more memory
+than the original synth. Supported
 browsers cache sample responses under `klavierlab-piano-samples-v1`; site storage
 can be cleared or evicted, so caching is not an offline availability guarantee.
 

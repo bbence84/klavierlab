@@ -22,6 +22,14 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.0', date: '2026-10-20', reconstructed: false,
+    title: { en: 'VexFlow notation & sampled piano by default', hu: 'VexFlow kotta és alapértelmezett mintavételezett zongora' },
+    changes: [
+      { kind: 'changed', text: { en: 'VexFlow engraves the scrolling grand staff, including chords, rests, accidentals, beams, and available fingering. Playback highlighting, seeking, and touch dragging remain supported.', hu: 'A gördülő zongorakottát a VexFlow rajzolja, akkordokkal, szünetekkel, módosítójelekkel, gerendákkal és elérhető ujjrenddel. A lejátszás kiemelése, a pozícióváltás és az érintéses húzás megmaradt.' } },
+      { kind: 'changed', text: { en: 'Sampled grand piano is the default for new or unset preferences. Saved sound choices are preserved. Samples load in the background, are cached when supported, and fall back to the original synth while loading or after failure.', hu: 'Új vagy még nem beállított profilnál a mintavételezett zongora az alapértelmezett. A mentett hangválasztás megmarad. A minták a háttérben töltődnek, támogatott böngészőben gyorsítótárba kerülnek; betöltés és hiba esetén az eredeti szintetizátor szól.' } },
+    ],
+  },
+  {
     version: '0.11.2', date: '2026-10-19', reconstructed: false,
     title: { en: 'Sound settings & focused song folders', hu: 'Hangbeállítások és rendezett dalmappák' },
     changes: [

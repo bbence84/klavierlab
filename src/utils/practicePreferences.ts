@@ -22,7 +22,7 @@ const DEFAULT_PREFERENCES: PracticePreferences = {
   handSelection: 'both', tempoMultiplier: 1, isAutoDemo: false,
   showGrandStaff: true, showFallingNotes: true, showKeyShortcuts: true,
   isMuted: false, isMetronomeEnabled: false,
-  soundEngine: 'original',
+  soundEngine: 'sampled',
 };
 
 export function readPracticePreferences(): PracticePreferences {
