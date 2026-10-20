@@ -28,6 +28,7 @@ export const RELEASES: Release[] = [
       { kind: 'fixed', text: { en: 'The piano keyboard is no longer pushed below the fold — the practice workspace now fits the viewport with the taller VexFlow staff.', hu: 'A zongorabillentyűzet már nem csúszik a képernyő alá — a gyakorlófelület a magasabb VexFlow kottával együtt is elfér a nézetben.' } },
       { kind: 'fixed', text: { en: 'High treble notes with long stems and fingering, and low bass notes, are no longer clipped at the top or bottom of the staff.', hu: 'A hosszú szárú, ujjrendes magas violinkulcsos hangok és a mély basszushangok már nem vágódnak le a kotta tetején vagy alján.' } },
       { kind: 'fixed', text: { en: 'Notes near the right edge now always have staff lines beneath them; the staff extends under every engraved note.', hu: 'A jobb szélhez közeli hangok alatt már mindig van vonalrendszer; a kotta minden lejegyzett hang alá kiterjed.' } },
+      { kind: 'fixed', text: { en: 'The practice workspace now fits the viewport on tablets and short landscape screens (e.g. iPad, Android tablets) — the chrome and grand staff compact so the keyboard stays visible without scrolling.', hu: 'A gyakorlófelület mostantól táblagépeken és alacsony, fekvő képernyőkön is elfér a nézetben (pl. iPad, Android táblagépek) — a fejléc és a kotta összehúzódik, így a billentyűzet görgetés nélkül látható marad.' } },
     ],
   },
   {
