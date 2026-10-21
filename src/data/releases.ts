@@ -22,6 +22,13 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.6', date: '2026-10-21', reconstructed: false,
+    title: { en: 'Cleaner Hungarian labels', hu: 'Letisztultabb magyar feliratok' },
+    changes: [
+      { kind: 'changed', text: { en: 'The Hungarian label for the practice mode now simply reads “Várakozó mód”, without the English text in parentheses.', hu: 'A gyakorlómód magyar felirata mostantól egyszerűen „Várakozó mód”, az angol szöveg nélkül.' } },
+    ],
+  },
+  {
     version: '0.12.5', date: '2026-10-21', reconstructed: false,
     title: { en: 'Chord practice — learn and check chords', hu: 'Akkordgyakorlás — akkordok tanulása és ellenőrzése' },
     changes: [

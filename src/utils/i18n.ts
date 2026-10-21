@@ -22,7 +22,7 @@ export const UI_TEXT = {
     resumePractice: 'Folytatás',
     pause: 'Szünet',
     restartTitle: 'Újrakezdés',
-    modeWaitForNote: 'Várakozó mód (Wait-for-Note)',
+    modeWaitForNote: 'Várakozó mód',
     modeContinuous: 'Folyamatos',
     listenDemo: 'Demó',
     handBoth: 'Mindkét kéz',
