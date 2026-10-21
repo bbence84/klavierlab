@@ -54,7 +54,7 @@ test('playback scrolls and highlights existing engraving without recreating it e
   await expect(page.locator('.notation-event[data-note-ids="c4 e4"]')).toBeVisible();
   await page.clock.install();
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
-  await page.getByRole('button', { name: 'Listen Demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   const chord = page.locator('.notation-event[data-note-ids="c4 e4"]');
   await chord.evaluate(group => group.setAttribute('data-probe', 'retained'));
   const before = await page.locator('.notation-timeline').getAttribute('transform');

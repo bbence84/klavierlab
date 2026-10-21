@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { HandSelection, Song, SongNote } from '../types/music';
-import { Language, ThemeMode, UI_TEXT } from '../utils/i18n';
+import { Language, ThemeMode } from '../utils/i18n';
 import { buildNotationEvents, NOTATION_HEADER, NOTATION_HEIGHT, renderVexFlow } from '../utils/vexflowNotation';
+
+// Fallback width used only before the SVG has been measured (sets the initial viewBox aspect).
+const NOTATION_WIDTH_BASE = 1000;
 
 interface SheetMusicBarProps {
   song: Song;
@@ -15,9 +18,9 @@ interface SheetMusicBarProps {
 }
 
 export function SheetMusicBar({ song, notes, currentTime, handSelection, lang, theme, expanded = false, onSeek }: SheetMusicBarProps) {
-  const t = UI_TEXT[lang];
   const containerRef = useRef<HTMLDivElement | null>(null);
   const notationRef = useRef<SVGGElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const [width, setWidth] = useState(1000);
   const [fontsReady, setFontsReady] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -39,8 +42,21 @@ export function SheetMusicBar({ song, notes, currentTime, handSelection, lang, t
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const observer = new ResizeObserver(entries => setWidth(Math.max(320, entries[0].contentRect.width)));
+    const svg = svgRef.current;
+    const measure = () => {
+      // The SVG is laid out with a responsive (clamped) height while the engraving is authored
+      // at a fixed NOTATION_HEIGHT. To make the staff fill the full width without letterboxing
+      // (preserveAspectRatio "meet" otherwise scales to the shorter dimension and leaves a gap
+      // on the right), derive the viewBox width from the SVG's actual on-screen aspect ratio so
+      // the viewBox aspect matches the box aspect and the content scales uniformly to fill.
+      const box = (svg ?? containerRef.current!).getBoundingClientRect();
+      const aspect = box.height > 0 ? box.width / box.height : NOTATION_WIDTH_BASE / NOTATION_HEIGHT;
+      setWidth(Math.max(320, Math.round(NOTATION_HEIGHT * aspect)));
+    };
+    const observer = new ResizeObserver(measure);
     observer.observe(containerRef.current);
+    if (svg) observer.observe(svg);
+    measure();
     return () => observer.disconnect();
   }, []);
 
@@ -96,14 +112,7 @@ export function SheetMusicBar({ song, notes, currentTime, handSelection, lang, t
 
   return (
     <div ref={containerRef} className={`sheet-music vexflow-sheet flex flex-col relative overflow-hidden border-b ${expanded ? 'sheet-expanded flex-1 min-h-[300px]' : ''} ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-      <div className="flex items-center justify-between px-4 py-1.5 border-b text-xs border-slate-500/20 text-slate-500">
-        <div className="flex items-center gap-2">
-          <span>{t.grandStaffTitle}</span><span aria-hidden="true">·</span><span>{song.keySignature}</span>
-          <span aria-hidden="true">·</span><span>{song.timeSignature[0]}/{song.timeSignature[1]} {t.meterSuffix}</span>
-        </div>
-        <div className="flex gap-4"><span>{t.trebleLegend}</span><span>{t.bassLegend}</span></div>
-      </div>
-      <svg viewBox={`0 0 ${width} ${NOTATION_HEIGHT}`} data-content-start={NOTATION_HEADER} data-renderer="vexflow" className={`sheet-navigation-surface w-full block ${expanded ? 'flex-1' : ''}`}
+      <svg ref={svgRef} viewBox={`0 0 ${width} ${NOTATION_HEIGHT}`} data-content-start={NOTATION_HEADER} data-renderer="vexflow" className={`sheet-navigation-surface w-full block ${expanded ? 'flex-1' : ''}`}
         preserveAspectRatio="xMinYMid meet" aria-label={lang === 'hu' ? 'Kotta' : 'Sheet music staff'}
         style={onSeek ? { touchAction: 'pan-y', cursor: isDragging ? 'grabbing' : 'grab' } : undefined}
         onPointerDown={beginSeek} onPointerMove={moveSeek} onPointerUp={event => finishSeek(event)} onPointerCancel={event => finishSeek(event, true)} onLostPointerCapture={event => finishSeek(event, true)}>

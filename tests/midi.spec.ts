@@ -271,6 +271,6 @@ test('demo playback sends notes through a Windows-style response-only BLE charac
   await page.reload();
   await connectBluetooth(page);
   await page.locator('.practice-options summary').click();
-  await page.getByRole('button', { name: 'Listen Demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await expect.poll(() => page.evaluate(() => window.midiTest.writes.some(write => write.mode === 'with' && write.bytes[2] === 0x90 && write.bytes[3] === 60))).toBe(true);
 });

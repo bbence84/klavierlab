@@ -39,7 +39,6 @@ import {
   Bell,
   BookOpen,
   Bluetooth,
-  ChartNoAxesCombined,
   CheckCircle2,
   Eye,
   Globe,
@@ -1021,9 +1020,6 @@ export default function App() {
     [currentSong]
   );
 
-  const beatsPerMeasure = currentSong.timeSignature[0];
-  const beatNumbers = Array.from({ length: beatsPerMeasure }, (_, i) => i + 1);
-
   // Visually highlight keys on the keyboard & canvas during Auto-Demo without scoring them
   const displayedActiveMidiKeys = useMemo(() => {
     if (!isAutoDemo || !isPlaying) return activeMidiKeys;
@@ -1123,7 +1119,6 @@ export default function App() {
                 : 'hover:text-white'
             }`}
           >
-            <ChartNoAxesCombined aria-hidden="true" />
             <span>{isHu ? 'Haladás' : 'Progress'}</span>
           </button>
           <button
@@ -1273,6 +1268,10 @@ export default function App() {
                   <span>
                     {isHu && currentSong.composerHu ? currentSong.composerHu : currentSong.composer}
                   </span>
+                  <span aria-hidden="true">·</span>
+                  <span>{currentSong.keySignature}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{currentSong.timeSignature[0]}/{currentSong.timeSignature[1]}</span>
                 </div>
               </div>
 
@@ -1504,6 +1503,60 @@ export default function App() {
                     </label>
                   </div>
                 </details>
+
+                {/* Studio Display toggles (moved up next to Settings) */}
+                <details className="display-options options-menu">
+                  <summary title={isHu ? 'Megjelenítés' : 'Display'}>
+                    <Eye aria-hidden="true" />
+                    <span className="sr-only">{isHu ? 'Megjelenítés' : 'Display'}</span>
+                  </summary>
+                  <div className="options-panel">
+                    <button
+                      onClick={() => setShowGrandStaff((s) => !s)}
+                      aria-pressed={showGrandStaff}
+                      className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
+                        showGrandStaff
+                          ? isLight
+                            ? 'bg-white text-sky-700 border-slate-300 shadow-2xs'
+                            : 'bg-slate-800 text-sky-300 border-slate-700'
+                          : 'bg-transparent text-slate-400 border-transparent hover:text-sky-500'
+                      }`}
+                    >
+                      <Eye className="w-3 h-3" />
+                      <span>{t.sheetMusicToggle}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setShowFallingNotes((f) => !f)}
+                      aria-pressed={showFallingNotes}
+                      className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
+                        showFallingNotes
+                          ? isLight
+                            ? 'bg-white text-sky-700 border-slate-300 shadow-2xs'
+                            : 'bg-slate-800 text-sky-300 border-slate-700'
+                          : 'bg-transparent text-slate-400 border-transparent hover:text-sky-500'
+                      }`}
+                    >
+                      <Layers className="w-3 h-3" />
+                      <span>{t.fallingNotesToggle}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setShowKeyShortcuts((k) => !k)}
+                      aria-pressed={showKeyShortcuts}
+                      className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
+                        showKeyShortcuts
+                          ? isLight
+                            ? 'bg-white text-sky-700 border-slate-300 shadow-2xs'
+                            : 'bg-slate-800 text-sky-300 border-slate-700'
+                          : 'bg-transparent text-slate-400 border-transparent hover:text-sky-500'
+                      }`}
+                    >
+                      <Keyboard className="w-3 h-3" />
+                      <span>{t.keyLabelsToggle}</span>
+                    </button>
+                  </div>
+                </details>
                 {/* Labeled Tempo Slider */}
                 <div className="tempo-control">
                   <label
@@ -1577,35 +1630,6 @@ export default function App() {
                     <Bell className="w-3 h-3" />
                     <span>{isMetronomeEnabled ? t.metronomeOn : t.metronomeOff}</span>
                   </button>
-
-                  {/* Visual Beat Click Indicator synchronized with Song BPM */}
-                  <div
-                    className="flex items-center gap-1 font-mono tabular-nums"
-                    title={`${t.beatLabel}: ${activeBeatInMeasure}/${beatsPerMeasure} (${Math.round(
-                      currentSong.bpm * tempoMultiplier
-                    )} BPM)`}
-                  >
-                    {beatNumbers.map((bNum) => {
-                      const isCurrentBeat = isPlaying && activeBeatInMeasure === bNum;
-                      const isDownbeat = bNum === 1;
-                      return (
-                        <span
-                          key={bNum}
-                          className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold transition-transform duration-75 ${
-                            isCurrentBeat
-                              ? isDownbeat
-                                ? 'bg-sky-600 text-white scale-110 shadow-xs'
-                                : 'bg-sky-500 text-slate-950 scale-105'
-                              : isLight
-                              ? 'bg-slate-100 text-slate-500'
-                              : 'bg-slate-800/80 text-slate-500'
-                          } ${isCurrentBeat && beatPulseActive ? 'ring-2 ring-sky-400' : ''}`}
-                        >
-                          {bNum}
-                        </span>
-                      );
-                    })}
-                  </div>
                 </div>
 
                 {/* Live Session Metrics (Tabular Numerals) */}
@@ -1633,75 +1657,22 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right: Studio Display, Synth, Language (HU/EN) & Theme (Dark/Light) Controls */}
-              <details className="display-options options-menu">
-                <summary title={isHu ? 'Megjelenítés' : 'Display'}>
-                  <Eye aria-hidden="true" />
-                  <span className="sr-only">{isHu ? 'Megjelenítés' : 'Display'}</span>
-                </summary>
-                <div className="options-panel">
-                <button
-                  onClick={() => setShowGrandStaff((s) => !s)}
-                  aria-pressed={showGrandStaff}
-                  className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
-                    showGrandStaff
-                      ? isLight
-                        ? 'bg-white text-sky-700 border-slate-300 shadow-2xs'
-                        : 'bg-slate-800 text-sky-300 border-slate-700'
-                      : 'bg-transparent text-slate-400 border-transparent hover:text-sky-500'
-                  }`}
-                >
-                  <Eye className="w-3 h-3" />
-                  <span>{t.sheetMusicToggle}</span>
-                </button>
-
-                <button
-                  onClick={() => setShowFallingNotes((f) => !f)}
-                  aria-pressed={showFallingNotes}
-                  className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
-                    showFallingNotes
-                      ? isLight
-                        ? 'bg-white text-sky-700 border-slate-300 shadow-2xs'
-                        : 'bg-slate-800 text-sky-300 border-slate-700'
-                      : 'bg-transparent text-slate-400 border-transparent hover:text-sky-500'
-                  }`}
-                >
-                  <Layers className="w-3 h-3" />
-                  <span>{t.fallingNotesToggle}</span>
-                </button>
-
-                <button
-                  onClick={() => setShowKeyShortcuts((k) => !k)}
-                  aria-pressed={showKeyShortcuts}
-                  className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
-                    showKeyShortcuts
-                      ? isLight
-                        ? 'bg-white text-sky-700 border-slate-300 shadow-2xs'
-                        : 'bg-slate-800 text-sky-300 border-slate-700'
-                      : 'bg-transparent text-slate-400 border-transparent hover:text-sky-500'
-                  }`}
-                >
-                  <Keyboard className="w-3 h-3" />
-                  <span>{t.keyLabelsToggle}</span>
-                </button>
-
-                </div>
-              </details>
+              {/* Middle: Sheet position scrubber (moved up from its own row) */}
+              <div className="song-navigation">
+                <span className="song-time font-mono">{currentTime.toFixed(1)}s</span>
+                <label htmlFor="song-position" className="sr-only">{isHu ? 'Dal pozíciója' : 'Song position'}</label>
+                <input id="song-position" type="range" min={0} max={songEndTime} step={0.01} value={Math.min(currentTime, songEndTime)} onChange={event => resetSession(currentSong, Number(event.target.value))} />
+                <span className="song-time font-mono">{songEndTime.toFixed(1)}s</span>
+                <select aria-label={isHu ? 'Ugrás ütemre' : 'Jump to measure'} value={activeMeasure} onChange={event => {
+                  const position = measurePositions.find(entry => entry.measure === Number(event.target.value));
+                  if (position) resetSession(currentSong, position.time);
+                }}>
+                  {measurePositions.map(position => <option key={position.measure} value={position.measure}>{isHu ? 'Ütem' : 'Bar'} {position.measure}</option>)}
+                </select>
+              </div>
             </div>
 
             {/* 1. Synchronized Grand Staff Sheet Music View */}
-            <div className="song-navigation">
-              <span className="song-time font-mono">{currentTime.toFixed(1)}s</span>
-              <label htmlFor="song-position" className="sr-only">{isHu ? 'Dal pozíciója' : 'Song position'}</label>
-              <input id="song-position" type="range" min={0} max={songEndTime} step={0.01} value={Math.min(currentTime, songEndTime)} onChange={event => resetSession(currentSong, Number(event.target.value))} />
-              <span className="song-time font-mono">{songEndTime.toFixed(1)}s</span>
-              <select aria-label={isHu ? 'Ugrás ütemre' : 'Jump to measure'} value={activeMeasure} onChange={event => {
-                const position = measurePositions.find(entry => entry.measure === Number(event.target.value));
-                if (position) resetSession(currentSong, position.time);
-              }}>
-                {measurePositions.map(position => <option key={position.measure} value={position.measure}>{isHu ? 'Ütem' : 'Bar'} {position.measure}</option>)}
-              </select>
-            </div>
             {showGrandStaff && (
               <SheetMusicBar
                 song={currentSong}

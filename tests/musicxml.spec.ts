@@ -112,7 +112,7 @@ test('supplied scores appear in level folders, stay out of Uploaded, and play in
   await expect(page.getByRole('button', { name: 'Choose piece', exact: true })).toContainText('Tavaszi szél');
   await expect(page.locator('label[for="tempo-slider"]')).toHaveText('Tempo: 100% (110 BPM)');
   await page.locator('.practice-options summary').click();
-  await page.getByRole('button', { name: 'Listen Demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
 });
 
@@ -246,7 +246,7 @@ test('studio imports compressed MusicXML and shows invalid-file errors', async (
   await expect(page.getByRole('alert')).toHaveCount(0);
   await page.getByRole('button', { name: 'Save & Open in Studio', exact: true }).click();
   await page.locator('.practice-options summary').click();
-  await page.getByRole('button', { name: 'Listen Demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
 });
 

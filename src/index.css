@@ -193,6 +193,7 @@
 .session-toolbar > .flex:first-child > .flex:last-child { gap: 8px; font-size: 10px; }
 .session-toolbar > .flex:first-child > .flex:last-child .font-bold { color: var(--ink); font-weight: 500; }
 .song-navigation { display: flex; align-items: center; gap: 12px; padding: 10px 28px; border-bottom: 1px solid var(--line); background: var(--surface); flex-shrink: 0; }
+.session-toolbar .song-navigation { flex: 1; min-width: 180px; padding: 0; border-bottom: 0; background: transparent; }
 .song-navigation input { flex: 1; min-width: 40px; height: 6px; accent-color: var(--accent); cursor: pointer; }
 .song-time { width: 48px; flex-shrink: 0; font-size: 10px; color: var(--quiet); text-align: center; }
 .song-navigation select { max-width: 110px; padding: 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); font-size: 11px; }

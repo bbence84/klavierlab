@@ -22,6 +22,15 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.3', date: '2026-10-21', reconstructed: false,
+    title: { en: 'Full-width staff & a tidier practice toolbar', hu: 'Teljes szélességű kotta és rendezettebb gyakorló eszköztár' },
+    changes: [
+      { kind: 'fixed', text: { en: 'The grand staff now fills the full width of the sheet-music area instead of leaving a large empty gap on the right, while keeping the notation at a uniform, undistorted scale.', hu: 'A kotta mostantól kitölti a kottanézet teljes szélességét, ahelyett hogy nagy üres rész maradna a jobb oldalon — mindezt egyenletes, torzításmentes méretezéssel.' } },
+      { kind: 'changed', text: { en: 'The practice toolbar is more compact, leaving more room for the piano, falling notes, and sheet music: the song-position scrubber moved up next to the metronome, the display options sit beside the settings menu, and the metronome beat counter was removed.', hu: 'A gyakorló eszköztár tömörebb, így több hely jut a zongorának, a lehulló hangjegyeknek és a kottának: a dalpozíció-csúszka a metronóm mellé került, a megjelenítési beállítások a beállítások menü mellett vannak, a metronóm ütemszámlálót pedig eltávolítottuk.' } },
+      { kind: 'changed', text: { en: 'Transport buttons use shorter labels (Continuous, Demo, Right, Left) and the piece key and time signature now appear in the subtitle next to the composer.', hu: 'A vezérlőgombok rövidebb feliratokat használnak (Folyamatos, Demó, Jobb, Bal), a zenemű hangneme és ütemmutatója pedig a zeneszerző melletti alcímben jelenik meg.' } },
+    ],
+  },
+  {
     version: '0.12.2', date: '2026-10-20', reconstructed: false,
     title: { en: 'Smoother playback on tablets', hu: 'Gördülékenyebb lejátszás táblagépeken' },
     changes: [
