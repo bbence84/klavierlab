@@ -29,7 +29,7 @@ export interface Song {
   bpm: number;
   timeSignature: [number, number]; // e.g., [4, 4] or [3, 4]
   keySignature: string;            // e.g., 'C Major', 'G Major', 'A Minor'
-  category: 'Beginner Lesson' | 'Classical' | 'Traditional' | 'Romantic' | 'Baroque' | 'Custom MIDI' | 'MusicXML' | 'Soundtrack';
+  category: 'Beginner Lesson' | 'Classical' | 'Traditional' | 'Romantic' | 'Baroque' | 'Chords' | 'Custom MIDI' | 'MusicXML' | 'Soundtrack';
   handArrangement: HandArrangement;
   description: string;
   descriptionHu?: string;

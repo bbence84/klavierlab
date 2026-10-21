@@ -70,6 +70,17 @@ const STORAGE_KEY_LANG = 'klavierlab_lang_v1';
 const STORAGE_KEY_THEME = 'klavierlab_theme_v1';
 const STORAGE_KEY_SIDEBAR = 'klavierlab_sidebar_collapsed_v1';
 
+// Notes starting within this window (seconds) are treated as one simultaneous chord.
+// Shared by the visual waiting-target set, the note matcher, and the continuous-mode
+// miss sweep so chord grouping stays consistent everywhere.
+const CHORD_WINDOW_SEC = 0.07;
+// In continuous mode, how long (seconds) the player has to complete the remaining
+// tones of a chord after striking the first one before the missing tones count as missed.
+const CHORD_COMPLETE_GRACE_SEC = 0.32;
+// Strictness: if the gap between the first and last struck chord tone exceeds this
+// (seconds), the chord is flagged as "not played together" (rolled), reducing the grade.
+const CHORD_TOGETHER_SEC = 0.12;
+
 const DEFAULT_PROFILE: PlayerProfile = {
   xp: 640,
   level: 2,
@@ -352,6 +363,16 @@ export default function App() {
   const currentTimeRef = useRef<number>(0);
   const sessionNotesRef = useRef<SongNote[]>(sessionNotes);
   const autoPlayedNoteIdsRef = useRef<Set<string>>(new Set());
+  // Tracks the chord currently being assembled so we can (a) grade "played together"
+  // strictness and (b) emit a single aggregated feedback when the chord completes.
+  // Keyed by the chord's earliest startTime; reset whenever a new chord begins.
+  const chordProgressRef = useRef<{
+    key: number;          // earliest startTime of the chord group (seconds)
+    size: number;         // total tones in the chord
+    hitIds: Set<string>;  // tone ids already struck
+    firstHitAt: number;   // performance-clock ms of the first tone struck
+    lastHitAt: number;    // performance-clock ms of the most recent tone struck
+  } | null>(null);
   const lastBeatIndexRef = useRef<number>(-1);
   const finalizedSessionRef = useRef<SessionStats | null>(null);
   const previousSongIdRef = useRef(currentSong.id);
@@ -382,6 +403,7 @@ export default function App() {
       setActiveBeatInMeasure(1);
       setBeatPulseActive(false);
       autoPlayedNoteIdsRef.current = new Set(targetSong.notes.filter(note => note.startTime < position).map(note => note.id));
+      chordProgressRef.current = null;
       const freshNotes = targetSong.notes.map((n) => ({
         ...n,
         status: n.startTime < position ? 'auto' as const : 'pending' as const,
@@ -445,7 +467,7 @@ export default function App() {
       const earliestTime = pendingTargetNotes[0].startTime;
       if (currentTime >= earliestTime - 0.04) {
         return pendingTargetNotes.filter(
-          (n) => Math.abs(n.startTime - earliestTime) <= 0.06
+          (n) => Math.abs(n.startTime - earliestTime) <= CHORD_WINDOW_SEC
         );
       }
     }
@@ -454,6 +476,24 @@ export default function App() {
       (n) => n.startTime - currentTime <= 0.35 && n.startTime - currentTime >= -0.18
     );
   }, [sessionNotes, handSelection, practiceMode, currentTime, isAutoDemo]);
+
+  // Rounded start-times (ms) that belong to a multi-note chord. Used to give chord
+  // tones a longer completion grace before the continuous-mode miss sweep fires, so a
+  // player can finish striking all tones of a chord at tempo.
+  const chordStartTimeMs = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const n of sessionNotes) {
+      const key = Math.round(n.startTime * 100); // ~10ms buckets > CHORD_WINDOW_SEC groups
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    const chordKeys = new Set<number>();
+    for (const [key, count] of counts) if (count > 1) chordKeys.add(key);
+    return chordKeys;
+  }, [sessionNotes]);
+  const chordStartTimeMsRef = useRef<Set<number>>(chordStartTimeMs);
+  useEffect(() => {
+    chordStartTimeMsRef.current = chordStartTimeMs;
+  }, [chordStartTimeMs]);
 
   // Finalize session & compute statistics + adaptive difficulty (never triggered for Demo mode)
   const finalizeSessionAndShowModal = useCallback(
@@ -610,8 +650,9 @@ export default function App() {
       if (practiceMode === 'wait-for-note') {
         const earliestTime = pendingTargets[0].startTime;
         const activeChordGroup = pendingTargets.filter(
-          (n) => Math.abs(n.startTime - earliestTime) <= 0.07
+          (n) => Math.abs(n.startTime - earliestTime) <= CHORD_WINDOW_SEC
         );
+        const isChord = activeChordGroup.length > 1;
         const matchedNote = activeChordGroup.find((n) => n.midi === midi);
 
         if (matchedNote) {
@@ -619,6 +660,17 @@ export default function App() {
             setIsPlaying(true);
           }
           setWrongMidiKey(null);
+          const nowMs = performance.now();
+
+          // Maintain chord-progress tracking for aggregated feedback + "together" grading.
+          let progress = chordProgressRef.current;
+          if (!progress || progress.key !== earliestTime) {
+            progress = { key: earliestTime, size: activeChordGroup.length, hitIds: new Set(), firstHitAt: nowMs, lastHitAt: nowMs };
+            chordProgressRef.current = progress;
+          }
+          progress.hitIds.add(matchedNote.id);
+          progress.lastHitAt = nowMs;
+
           const timingDeltaMs = Math.round((nowSec - matchedNote.startTime) * 1000);
           const absDelta = Math.abs(timingDeltaMs);
           const grade: 'perfect' | 'good' = absDelta <= 90 ? 'perfect' : 'good';
@@ -643,15 +695,47 @@ export default function App() {
             return nextS;
           });
           setLiveScore((sc) => sc + points);
-          setLatestFeedback({
-            id: `fb-${Date.now()}`,
-            grade,
-            label: `${midiToNoteName(midi)} +${points}`,
-            sublabel: `${
-              matchedNote.hand === 'right' ? t.rightHandShort : t.leftHandShort
-            }${matchedNote.finger ? ` · ${t.fingerShort} ${matchedNote.finger}` : ''}`,
-            timestamp: Date.now(),
-          });
+
+          if (isChord) {
+            const hitCount = progress.hitIds.size;
+            const chordComplete = hitCount >= progress.size;
+            if (chordComplete) {
+              // "Played together" strictness: measure the spread of all strikes.
+              const spreadSec = (progress.lastHitAt - progress.firstHitAt) / 1000;
+              const tooSpread = spreadSec > CHORD_TOGETHER_SEC;
+              const chordNames = activeChordGroup
+                .map((n) => midiToNoteName(n.midi))
+                .join(' · ');
+              setLatestFeedback({
+                id: `fb-${Date.now()}`,
+                grade: tooSpread ? 'good' : grade,
+                label: `${tooSpread ? t.chordTooSpread : t.chordComplete} · ${chordNames}`,
+                sublabel: tooSpread
+                  ? `${Math.round(spreadSec * 1000)}ms`
+                  : `+${points} · ${t.streak} ${currentStreak + 1}`,
+                timestamp: Date.now(),
+              });
+              chordProgressRef.current = null;
+            } else {
+              setLatestFeedback({
+                id: `fb-${Date.now()}`,
+                grade: 'good',
+                label: `${t.chordPartial} (${hitCount}/${progress.size})`,
+                sublabel: midiToNoteName(midi),
+                timestamp: Date.now(),
+              });
+            }
+          } else {
+            setLatestFeedback({
+              id: `fb-${Date.now()}`,
+              grade,
+              label: `${midiToNoteName(midi)} +${points}`,
+              sublabel: `${
+                matchedNote.hand === 'right' ? t.rightHandShort : t.leftHandShort
+              }${matchedNote.finger ? ` · ${t.fingerShort} ${matchedNote.finger}` : ''}`,
+              timestamp: Date.now(),
+            });
+          }
 
           if (nowSec < matchedNote.startTime) {
             currentTimeRef.current = matchedNote.startTime;
@@ -716,13 +800,55 @@ export default function App() {
           return nextS;
         });
         setLiveScore((sc) => sc + points);
-        setLatestFeedback({
-          id: `fb-${Date.now()}`,
-          grade,
-          label: `${midiToNoteName(midi)} (${deltaMs > 0 ? `+${deltaMs}` : deltaMs}ms)`,
-          sublabel: `+${points} · ${t.streak} ${currentStreak + 1}`,
-          timestamp: Date.now(),
-        });
+
+        // Chord awareness in continuous mode: a chord is any set of same-hand pending
+        // targets sharing this candidate's startTime. We require all tones (the rAF
+        // miss-sweep still marks un-played tones missed after the window) and emit a
+        // single aggregated feedback + "played together" grade instead of per-tone noise.
+        const chordGroup = pendingTargets.filter(
+          (n) => Math.abs(n.startTime - candidate.startTime) <= CHORD_WINDOW_SEC
+        );
+        if (chordGroup.length > 1) {
+          const nowMs = performance.now();
+          let progress = chordProgressRef.current;
+          if (!progress || progress.key !== candidate.startTime) {
+            progress = { key: candidate.startTime, size: chordGroup.length, hitIds: new Set(), firstHitAt: nowMs, lastHitAt: nowMs };
+            chordProgressRef.current = progress;
+          }
+          progress.hitIds.add(candidate.id);
+          progress.lastHitAt = nowMs;
+          const hitCount = progress.hitIds.size;
+          const chordComplete = hitCount >= progress.size;
+          const chordNames = chordGroup.map((n) => midiToNoteName(n.midi)).join(' · ');
+          if (chordComplete) {
+            const spreadSec = (progress.lastHitAt - progress.firstHitAt) / 1000;
+            const tooSpread = spreadSec > CHORD_TOGETHER_SEC;
+            setLatestFeedback({
+              id: `fb-${Date.now()}`,
+              grade: tooSpread ? 'good' : grade,
+              label: `${tooSpread ? t.chordTooSpread : t.chordComplete} · ${chordNames}`,
+              sublabel: tooSpread ? `${Math.round(spreadSec * 1000)}ms` : `+${points} · ${t.streak} ${currentStreak + 1}`,
+              timestamp: Date.now(),
+            });
+            chordProgressRef.current = null;
+          } else {
+            setLatestFeedback({
+              id: `fb-${Date.now()}`,
+              grade: 'good',
+              label: `${t.chordPartial} (${hitCount}/${progress.size})`,
+              sublabel: midiToNoteName(midi),
+              timestamp: Date.now(),
+            });
+          }
+        } else {
+          setLatestFeedback({
+            id: `fb-${Date.now()}`,
+            grade,
+            label: `${midiToNoteName(midi)} (${deltaMs > 0 ? `+${deltaMs}` : deltaMs}ms)`,
+            sublabel: `+${points} · ${t.streak} ${currentStreak + 1}`,
+            timestamp: Date.now(),
+          });
+        }
       } else if (isPlaying) {
         setWrongMidiKey(midi);
         setWrongPressCount((w) => w + 1);
@@ -919,15 +1045,19 @@ export default function App() {
           !isAutoDemo &&
           practiceMode === 'continuous' &&
           isTargetHand &&
-          note.status === 'pending' &&
-          (nextSec > note.startTime + 0.26 || reachedEnd)
+          note.status === 'pending'
         ) {
-          if (!updatedNotes) updatedNotes = notes.slice();
-          updatedNotes[i] = {
-            ...note,
-            status: 'missed' as const,
-            hitGrade: 'miss' as const,
-          };
+          // Chord tones get a longer completion grace so all tones can be struck at tempo.
+          const isChordTone = chordStartTimeMsRef.current.has(Math.round(note.startTime * 100));
+          const missWindow = isChordTone ? CHORD_COMPLETE_GRACE_SEC : 0.26;
+          if (nextSec > note.startTime + missWindow || reachedEnd) {
+            if (!updatedNotes) updatedNotes = notes.slice();
+            updatedNotes[i] = {
+              ...note,
+              status: 'missed' as const,
+              hitGrade: 'miss' as const,
+            };
+          }
         }
       }
 

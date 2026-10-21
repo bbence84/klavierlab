@@ -83,6 +83,9 @@ export const UI_TEXT = {
     fbMiss: '○ KIMARADT HANG',
     playedKey: 'Leütött:',
     expectedKey: 'Várt hang:',
+    chordComplete: 'Akkord kész',
+    chordPartial: 'Akkord folytatódik',
+    chordTooSpread: 'Nem egyszerre',
 
     // Hand arrangement labels
     arrRightOnly: 'Csak jobb kéz',
@@ -178,6 +181,9 @@ export const UI_TEXT = {
     fbMiss: '○ MISSED NOTE',
     playedKey: 'Played',
     expectedKey: 'Expected',
+    chordComplete: 'Chord complete',
+    chordPartial: 'Chord in progress',
+    chordTooSpread: 'Not together',
 
     // Hand arrangement labels
     arrRightOnly: 'Right Hand Only',

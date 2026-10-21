@@ -21,11 +21,13 @@ export function SongPicker({ songs, selectedSong, lang, onSelectSong }: SongPick
   const displayTitle = (song: Song) => isHu && song.titleHu ? song.titleHu : song.title;
   const displayComposer = (song: Song) => isHu && song.composerHu ? song.composerHu : song.composer;
   const uploaded = (song: Song) => Boolean(song.isCustomMidi || song.importFormat === 'musicxml');
+  const isChordSong = (song: Song) => song.category === 'Chords';
   const searchText = query.trim().toLocaleLowerCase();
   const matches = (song: Song) => [song.title, song.titleHu, song.composer, song.composerHu, `Level ${song.level}`, `${song.level}. szint`]
     .some(value => value?.toLocaleLowerCase().includes(searchText));
   const groups = [
-    ...[1, 2, 3, 4, 5].map(level => ({ id: `level-${level}`, name: getLevelTitle(level, lang), songs: songs.filter(song => !uploaded(song) && song.level === level) })),
+    ...[1, 2, 3, 4, 5].map(level => ({ id: `level-${level}`, name: getLevelTitle(level, lang), songs: songs.filter(song => !uploaded(song) && !isChordSong(song) && song.level === level) })),
+    { id: 'chords', name: isHu ? 'Akkordok' : 'Chords', songs: songs.filter(song => !uploaded(song) && isChordSong(song)).sort((first, second) => first.level - second.level || displayTitle(first).localeCompare(displayTitle(second), lang)) },
     { id: 'uploaded', name: isHu ? 'Feltöltött kották' : 'Uploaded', songs: songs.filter(uploaded).sort((first, second) => first.level - second.level || displayTitle(first).localeCompare(displayTitle(second), lang)) },
   ];
   const matchingGroups = groups.map(group => ({ ...group, songs: group.songs.filter(matches) }));
@@ -62,7 +64,7 @@ export function SongPicker({ songs, selectedSong, lang, onSelectSong }: SongPick
         data-song-id={selectedSong.id}
         title={displayTitle(selectedSong)}
         onClick={() => {
-          const activeFolder = uploaded(selectedSong) ? 'uploaded' : `level-${selectedSong.level}`;
+          const activeFolder = uploaded(selectedSong) ? 'uploaded' : isChordSong(selectedSong) ? 'chords' : `level-${selectedSong.level}`;
           setCollapsed(new Set(groups.filter(group => group.id !== activeFolder).map(group => group.id)));
           setQuery('');
           setOpen(true);

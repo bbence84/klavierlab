@@ -19,6 +19,7 @@ type LibraryFilter =
   | 'all'
   | 'single-hand'
   | 'alternating'
+  | 'chords'
   | 'level-1'
   | 'level-2-3'
   | 'level-4-5'
@@ -78,6 +79,8 @@ export const SongLibraryView: React.FC<SongLibraryViewProps> = ({
         return arrangement === 'right-only' || arrangement === 'left-only';
       case 'alternating':
         return arrangement === 'alternating-hands';
+      case 'chords':
+        return song.category === 'Chords';
       case 'level-1':
         return song.level === 1;
       case 'level-2-3':
@@ -206,6 +209,18 @@ export const SongLibraryView: React.FC<SongLibraryViewProps> = ({
             }`}
           >
             {isHu ? 'Váltott kéz (egyszerre egy)' : 'Alternating Hands'}
+          </button>
+          <button
+            onClick={() => setActiveFilter('chords')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              activeFilter === 'chords'
+                ? 'bg-sky-500 text-slate-950 font-semibold'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            {isHu ? 'Akkordok' : 'Chords'}
           </button>
           <button
             onClick={() => setActiveFilter('level-1')}

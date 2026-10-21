@@ -75,7 +75,7 @@ test('all seven supplied MIDI scores are built in with accurate metadata and sta
     const modulePath = '/src/data/songs.ts';
     return (await import(modulePath)).INITIAL_SONGS;
   });
-  expect(songs).toHaveLength(24);
+  expect(songs).toHaveLength(27);
   const expected: [string, number, number][] = [
     ['repertoire-bujj-bujj-zold-ag', 45, 100], ['repertoire-csiga-biga-gyere-ki', 25, 100],
     ['repertoire-kis-kece-lanyom', 44, 84], ['repertoire-suss-fel-nap', 17, 96],

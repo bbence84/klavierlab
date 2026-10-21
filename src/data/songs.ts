@@ -1531,6 +1531,128 @@ const RAW_INITIAL_SONGS: Song[] = [
       { beat: 20, durBeats: 4, midi: 72, hand: 'right', finger: 5 },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // CHORDS · dedicated chord-practice folder (teaches + validates stacked notes)
+  // ─────────────────────────────────────────────────────────────────────
+  {
+    id: 'chords-major-triads-rh',
+    title: 'Major Triads · Right Hand',
+    titleHu: 'Dúr hármashangzatok · Jobb kéz',
+    composer: 'KlavierLab Exercise',
+    composerHu: 'KlavierLab gyakorlat',
+    level: 1,
+    bpm: 60,
+    timeSignature: [4, 4],
+    keySignature: 'C Major',
+    category: 'Chords',
+    handArrangement: 'right-only',
+    description:
+      'Four root-position major triads in the right hand: C (C4-E4-G4), F (C4-F4-A4), G (B3-D4-G4) and back to C. Press all three notes of each chord together. Best practiced in "Wait for note" mode.',
+    descriptionHu:
+      'Négy alaphelyzetű dúr hármashangzat a jobb kézzel: C (C4-E4-G4), F (C4-F4-A4), G (H3-D4-G4) és vissza C-re. Minden akkord három hangját egyszerre üsd le. Leginkább a „Várj a hangra” módban gyakorolható.',
+    focusSkill: 'Root-Position Triads · Simultaneous Notes · Right Hand',
+    focusSkillHu: 'Alaphelyzetű hármashangzatok · Egyszerre leütött hangok · Jobb kéz',
+    durationSeconds: 12,
+    notes: buildNotes(60, 4, [
+      // C major (C4 E4 G4)
+      { beat: 0, durBeats: 2, midi: 60, hand: 'right', finger: 1 },
+      { beat: 0, durBeats: 2, midi: 64, hand: 'right', finger: 3 },
+      { beat: 0, durBeats: 2, midi: 67, hand: 'right', finger: 5 },
+      // F major (C4 F4 A4)
+      { beat: 2, durBeats: 2, midi: 60, hand: 'right', finger: 1 },
+      { beat: 2, durBeats: 2, midi: 65, hand: 'right', finger: 3 },
+      { beat: 2, durBeats: 2, midi: 69, hand: 'right', finger: 5 },
+      // G major (B3 D4 G4)
+      { beat: 4, durBeats: 2, midi: 59, hand: 'right', finger: 1 },
+      { beat: 4, durBeats: 2, midi: 62, hand: 'right', finger: 2 },
+      { beat: 4, durBeats: 2, midi: 67, hand: 'right', finger: 5 },
+      // C major (C4 E4 G4)
+      { beat: 6, durBeats: 2, midi: 60, hand: 'right', finger: 1 },
+      { beat: 6, durBeats: 2, midi: 64, hand: 'right', finger: 3 },
+      { beat: 6, durBeats: 2, midi: 67, hand: 'right', finger: 5 },
+    ]),
+  },
+  {
+    id: 'chords-triad-inversions-rh',
+    title: 'C Major Triad Inversions',
+    titleHu: 'C-dúr hármashangzat fordítások',
+    composer: 'KlavierLab Exercise',
+    composerHu: 'KlavierLab gyakorlat',
+    level: 2,
+    bpm: 60,
+    timeSignature: [4, 4],
+    keySignature: 'C Major',
+    category: 'Chords',
+    handArrangement: 'right-only',
+    description:
+      'The C major triad in all three positions: root (C4-E4-G4), first inversion (E4-G4-C5), second inversion (G4-C5-E5), and back to root up an octave (C5-E5-G5). Learn how the same chord changes shape.',
+    descriptionHu:
+      'A C-dúr hármashangzat mindhárom helyzetben: alaphelyzet (C4-E4-G4), első fordítás (E4-G4-C5), második fordítás (G4-C5-E5), majd vissza alaphelyzetbe egy oktávval feljebb (C5-E5-G5). Ismerd meg, hogyan változik ugyanazon akkord alakja.',
+    focusSkill: 'Triad Inversions · Hand Shape · Right Hand',
+    focusSkillHu: 'Hármashangzat-fordítások · Kéztartás · Jobb kéz',
+    durationSeconds: 12,
+    notes: buildNotes(60, 4, [
+      // Root (C4 E4 G4)
+      { beat: 0, durBeats: 2, midi: 60, hand: 'right', finger: 1 },
+      { beat: 0, durBeats: 2, midi: 64, hand: 'right', finger: 3 },
+      { beat: 0, durBeats: 2, midi: 67, hand: 'right', finger: 5 },
+      // 1st inversion (E4 G4 C5)
+      { beat: 2, durBeats: 2, midi: 64, hand: 'right', finger: 1 },
+      { beat: 2, durBeats: 2, midi: 67, hand: 'right', finger: 2 },
+      { beat: 2, durBeats: 2, midi: 72, hand: 'right', finger: 5 },
+      // 2nd inversion (G4 C5 E5)
+      { beat: 4, durBeats: 2, midi: 67, hand: 'right', finger: 1 },
+      { beat: 4, durBeats: 2, midi: 72, hand: 'right', finger: 3 },
+      { beat: 4, durBeats: 2, midi: 76, hand: 'right', finger: 5 },
+      // Root octave up (C5 E5 G5)
+      { beat: 6, durBeats: 2, midi: 72, hand: 'right', finger: 1 },
+      { beat: 6, durBeats: 2, midi: 76, hand: 'right', finger: 3 },
+      { beat: 6, durBeats: 2, midi: 79, hand: 'right', finger: 5 },
+    ]),
+  },
+  {
+    id: 'chords-pop-progression-two-hands',
+    title: 'Pop Progression · I–V–vi–IV',
+    titleHu: 'Popakkordmenet · I–V–vi–IV',
+    composer: 'KlavierLab Exercise',
+    composerHu: 'KlavierLab gyakorlat',
+    level: 3,
+    bpm: 66,
+    timeSignature: [4, 4],
+    keySignature: 'C Major',
+    category: 'Chords',
+    handArrangement: 'two-hands',
+    description:
+      'The classic four-chord pop progression in C: C major, G major, A minor, F major. The left hand plays the bass root while the right hand plays the full triad — both struck together. Great for two-hand chord coordination.',
+    descriptionHu:
+      'A klasszikus négyakkordos popmenet C-ben: C-dúr, G-dúr, a-moll, F-dúr. A bal kéz a basszus alaphangot játssza, a jobb kéz a teljes hármashangzatot — egyszerre leütve. Kiváló a kétkezes akkordösszehangoláshoz.',
+    focusSkill: 'Two-Hand Chords · Chord Progression · Bass + Triad',
+    focusSkillHu: 'Kétkezes akkordok · Akkordmenet · Basszus + hármashangzat',
+    durationSeconds: 15,
+    notes: buildNotes(66, 4, [
+      // C major — bass C3 + triad C4 E4 G4
+      { beat: 0, durBeats: 4, midi: 48, hand: 'left', finger: 5 },
+      { beat: 0, durBeats: 4, midi: 60, hand: 'right', finger: 1 },
+      { beat: 0, durBeats: 4, midi: 64, hand: 'right', finger: 3 },
+      { beat: 0, durBeats: 4, midi: 67, hand: 'right', finger: 5 },
+      // G major — bass G2 + triad G3 B3 D4
+      { beat: 4, durBeats: 4, midi: 43, hand: 'left', finger: 5 },
+      { beat: 4, durBeats: 4, midi: 55, hand: 'right', finger: 1 },
+      { beat: 4, durBeats: 4, midi: 59, hand: 'right', finger: 3 },
+      { beat: 4, durBeats: 4, midi: 62, hand: 'right', finger: 5 },
+      // A minor — bass A2 + triad A3 C4 E4
+      { beat: 8, durBeats: 4, midi: 45, hand: 'left', finger: 5 },
+      { beat: 8, durBeats: 4, midi: 57, hand: 'right', finger: 1 },
+      { beat: 8, durBeats: 4, midi: 60, hand: 'right', finger: 3 },
+      { beat: 8, durBeats: 4, midi: 64, hand: 'right', finger: 5 },
+      // F major — bass F2 + triad F3 A3 C4
+      { beat: 12, durBeats: 4, midi: 41, hand: 'left', finger: 5 },
+      { beat: 12, durBeats: 4, midi: 53, hand: 'right', finger: 1 },
+      { beat: 12, durBeats: 4, midi: 57, hand: 'right', finger: 3 },
+      { beat: 12, durBeats: 4, midi: 60, hand: 'right', finger: 5 },
+    ]),
+  },
 ];
 
 export const INITIAL_SONGS: Song[] = [...RAW_INITIAL_SONGS, ...BUNDLED_MIDI_SONGS].map((song) => ({

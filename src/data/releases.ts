@@ -22,6 +22,15 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.5', date: '2026-10-21', reconstructed: false,
+    title: { en: 'Chord practice — learn and check chords', hu: 'Akkordgyakorlás — akkordok tanulása és ellenőrzése' },
+    changes: [
+      { kind: 'added', text: { en: 'A new "Chords" folder in the piece picker (and a Chords filter in the library) with three practice exercises: right-hand major triads, C major triad inversions, and a two-hand I–V–vi–IV pop progression.', hu: 'Egy új „Akkordok” mappa a dalválasztóban (és egy Akkordok szűrő a kottátárban) három gyakorlattal: jobb kezes dúr hármashangzatok, C-dúr hangzatfordulások és egy kétkezes I–V–vi–IV popmenet.' } },
+      { kind: 'added', text: { en: 'Chords are now taught and checked properly: in "Wait for note" mode the app waits until every note of the chord is pressed (in any order), and a single combined “Chord complete” message replaces the one-per-note feedback.', hu: 'Az akkordokat mostantól rendesen tanítja és ellenőrzi az alkalmazás: a „Várj a hangra” módban megvárja, amíg az akkord minden hangját leütöd (bármilyen sorrendben), és egyetlen összevont „Akkord kész” üzenet jelenik meg a hangonkénti visszajelzés helyett.' } },
+      { kind: 'changed', text: { en: 'Chord checking also works in the tempo-based “Continuous” mode, with a little extra time to finish all the notes, and chords played too far apart are flagged as “not together” so you can practice striking them as one.', hu: 'Az akkordellenőrzés a tempo alapú „Folyamatos” módban is működik, egy kis extra idővel az összes hang befejezéséhez, a túl széteső akkordokat pedig „nem egyszerre” jelzéssel látja el, így gyakorolhatod az egyszerre történő legerítést.' } },
+    ],
+  },
+  {
     version: '0.12.4', date: '2026-10-21', reconstructed: false,
     title: { en: 'Collapsible sidebar for a wider workspace', hu: 'Összecsukható oldalsáv a szélesebb munkaterületért' },
     changes: [
