@@ -517,9 +517,11 @@ export default function App() {
       const hitTotal = perfectHits + goodHits + earlyLateHits;
       const missedNotes = Math.max(0, totalTargetNotes - hitTotal);
 
-      const rawAccuracy = Math.round(
-        ((perfectHits + goodHits * 0.9 + earlyLateHits * 0.7) / totalTargetNotes) * 100
-      );
+      // Accuracy reflects precision: weighted correct hits divided by every scored
+      // action — target notes PLUS wrong key presses — so mashing wrong keys lowers it.
+      const weightedHits = perfectHits + goodHits * 0.9 + earlyLateHits * 0.7;
+      const scoredActions = totalTargetNotes + wrongPressCount;
+      const rawAccuracy = Math.round((weightedHits / Math.max(1, scoredActions)) * 100);
       const accuracyPercent = Math.max(
         0,
         Math.min(100, hitTotal === 0 ? 0 : rawAccuracy)
@@ -1157,10 +1159,12 @@ export default function App() {
         (handSelection === 'both' || n.hand === handSelection) &&
         (n.status === 'hit' || n.status === 'missed')
     );
-    if (resolved.length === 0) return 100;
+    if (resolved.length === 0 && wrongPressCount === 0) return 100;
     const hits = resolved.filter((n) => n.status === 'hit').length;
-    return Math.round((hits / resolved.length) * 100);
-  }, [sessionNotes, handSelection]);
+    // Wrong key presses count against accuracy by enlarging the denominator.
+    const denom = Math.max(1, resolved.length + wrongPressCount);
+    return Math.round((hits / denom) * 100);
+  }, [sessionNotes, handSelection, wrongPressCount]);
 
   const songHasRightNotes = useMemo(
     () => currentSong.notes.some((n) => n.hand === 'right'),

@@ -22,6 +22,14 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.7', date: '2026-10-21', reconstructed: false,
+    title: { en: 'Accuracy counts mistakes', hu: 'A pontosság figyeli a hibákat' },
+    changes: [
+      { kind: 'fixed', text: { en: 'Accuracy now counts wrong and misplaced key presses, so hitting extra wrong keys lowers your score instead of staying near 100%.', hu: 'A pontosság mostantól beszámítja a hibás és rossz helyen leütött billentyűket, így a felesleges hibás leütések csökkentik az eredményt, nem maradnak 100% közelében.' } },
+      { kind: 'changed', text: { en: 'The sheet music now has a subtle left border that separates it cleanly from the rest of the practice view.', hu: 'A kottának mostantól van egy finom bal oldali szegélye, amely tisztán elválasztja a gyakorlónézet többi részétől.' } },
+    ],
+  },
+  {
     version: '0.12.6', date: '2026-10-21', reconstructed: false,
     title: { en: 'Cleaner Hungarian labels', hu: 'Letisztultabb magyar feliratok' },
     changes: [

@@ -238,7 +238,7 @@
 .piano-keyboard > div:first-child { background: #53796b; height: 3px; border: 0; }
 .piano-keyboard > div:last-child { height: 147px; }
 .piano-keyboard button { border-radius: 0 0 3px 3px; }
-.sheet-music { background: var(--surface) !important; }
+.sheet-music { background: var(--surface) !important; border-left: 1px solid var(--line); }
 .vexflow-sheet { flex: 0 1 auto; min-height: 0; }
 .vexflow-sheet > svg { height: clamp(150px, 30vh, 300px); flex-shrink: 0; }
 .vexflow-sheet.sheet-expanded { flex: 1 1 auto; }
