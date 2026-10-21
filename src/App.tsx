@@ -46,6 +46,8 @@ import {
   Layers,
   Moon,
   Music,
+  PanelLeftClose,
+  PanelLeftOpen,
   Pause,
   Piano,
   Play,
@@ -53,6 +55,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Sun,
+  TrendingUp,
   Upload,
   Volume2,
   VolumeX,
@@ -65,6 +68,7 @@ const STORAGE_KEY_PROFILE = 'klavierlab_profile_v3';
 const STORAGE_KEY_CUSTOM_SONGS = 'klavierlab_custom_songs_v3';
 const STORAGE_KEY_LANG = 'klavierlab_lang_v1';
 const STORAGE_KEY_THEME = 'klavierlab_theme_v1';
+const STORAGE_KEY_SIDEBAR = 'klavierlab_sidebar_collapsed_v1';
 
 const DEFAULT_PROFILE: PlayerProfile = {
   xp: 640,
@@ -179,6 +183,23 @@ export default function App() {
       return 'light';
     }
   });
+
+  // Sidebar collapse state (icon-only rail toggle)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY_SIDEBAR) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_SIDEBAR, String(sidebarCollapsed));
+    } catch {
+      // Ignore storage error
+    }
+  }, [sidebarCollapsed]);
 
   useEffect(() => {
     try {
@@ -1035,8 +1056,8 @@ export default function App() {
   return (
     <div
       className={`app-shell min-h-screen transition-colors duration-150 ${
-        isLight ? 'bg-slate-50 text-slate-900' : 'bg-[#0B0F17] text-slate-100'
-      }`}
+        sidebarCollapsed ? 'is-collapsed' : ''
+      } ${isLight ? 'bg-slate-50 text-slate-900' : 'bg-[#0B0F17] text-slate-100'}`}
     >
       {/* STRICT 3-ZONE TOP BAR CONTRACT */}
       <header
@@ -1119,6 +1140,7 @@ export default function App() {
                 : 'hover:text-white'
             }`}
           >
+            <TrendingUp aria-hidden="true" />
             <span>{isHu ? 'Haladás' : 'Progress'}</span>
           </button>
           <button
@@ -1177,6 +1199,34 @@ export default function App() {
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-400" />
               </>
+            )}
+          </button>
+
+          {/* Sidebar collapse / expand toggle */}
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((c) => !c)}
+            aria-pressed={sidebarCollapsed}
+            aria-label={
+              sidebarCollapsed
+                ? isHu ? 'Oldalsáv kinyitása' : 'Expand sidebar'
+                : isHu ? 'Oldalsáv összecsukása' : 'Collapse sidebar'
+            }
+            title={
+              sidebarCollapsed
+                ? isHu ? 'Oldalsáv kinyitása' : 'Expand sidebar'
+                : isHu ? 'Oldalsáv összecsukása' : 'Collapse sidebar'
+            }
+            className={`px-2.5 py-2 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+              isLight
+                ? 'bg-slate-50 text-slate-800 border-slate-300 hover:bg-slate-100'
+                : 'bg-[#111827] text-slate-200 border-slate-700 hover:bg-slate-800'
+            }`}
+          >
+            {sidebarCollapsed ? (
+              <PanelLeftOpen className="w-3.5 h-3.5 text-sky-500" />
+            ) : (
+              <PanelLeftClose className="w-3.5 h-3.5 text-sky-500" />
             )}
           </button>
 

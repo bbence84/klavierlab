@@ -22,6 +22,14 @@ export const CHANGE_LABELS: Record<ChangeKind, LocalizedText> = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.12.4', date: '2026-10-21', reconstructed: false,
+    title: { en: 'Collapsible sidebar for a wider workspace', hu: 'Összecsukható oldalsáv a szélesebb munkaterületért' },
+    changes: [
+      { kind: 'added', text: { en: 'A new collapse button in the sidebar (next to the dark/light switch) shrinks the navigation to a compact icon-only rail, giving the piano, falling notes, and sheet music more horizontal room. Your choice is remembered between sessions.', hu: 'Egy új összecsukó gomb az oldalsávon (a sötét/világos kapcsoló mellett) egy kompakt, csak ikonos sávvá zsugorítja a navigációt, így több vízszintes hely jut a zongorának, a lehulló hangjegyeknek és a kottának. A beállítás megmarad a következő megnyitásig.' } },
+      { kind: 'changed', text: { en: 'When the sidebar is collapsed, the main workspace automatically expands to fill the extra space and the sheet music re-renders at the new wider size.', hu: 'Amikor az oldalsáv össze van csukva, a fő munkaterület automatikusan kitölti a felszabadult helyet, és a kotta az új, szélesebb méretben jelenik meg újra.' } },
+    ],
+  },
+  {
     version: '0.12.3', date: '2026-10-21', reconstructed: false,
     title: { en: 'Full-width staff & a tidier practice toolbar', hu: 'Teljes szélességű kotta és rendezettebb gyakorló eszköztár' },
     changes: [
